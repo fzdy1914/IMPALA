@@ -8,6 +8,8 @@ from utils import make_time_major
 
 def learner(model, data, ps, args):
     """Learner to get trajectories from Actors."""
+    if torch.cuda.is_available():
+        model.cuda()
     optimizer = optim.RMSprop(model.parameters(), lr=args.lr, eps=args.epsilon,
                               weight_decay=args.decay,
                               momentum=args.momentum)
@@ -57,3 +59,4 @@ def learner(model, data, ps, args):
         if torch.cuda.is_available():
             model.cuda()
         batch = []
+        print("go with one batch")

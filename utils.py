@@ -46,4 +46,5 @@ def combine_time_batch(x, last_action, reward, actor=False):
     x = x.reshape(seq_len * bs, *x.shape[2:])
     last_action = last_action.reshape(seq_len * bs, -1)
     reward = reward.reshape(seq_len * bs, 1)
+    print(seq_len, bs, x.shape, last_action.shape, reward.shape)
     return seq_len, bs, x, last_action, reward
