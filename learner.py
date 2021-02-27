@@ -29,14 +29,13 @@ def learner(model, data, ps, args):
 
     """Gets trajectories from actors and trains learner."""
     batch = []
-    t = trange(10000000)
+    t = trange(100000)
     for epoch in t:
-        trajectory = data.get()
-        batch.append(trajectory)
-        if torch.cuda.is_available():
-            trajectory.cuda()
-        if len(batch) < batch_size:
-            continue
+        while len(batch) < batch_size:
+            trajectory = data.get()
+            batch.append(trajectory)
+            if torch.cuda.is_available():
+                trajectory.cuda()
         boards, actions, rewards, dones, behaviour_logits = make_time_major(batch)
         optimizer.zero_grad()
         logits, values = model(boards)
@@ -65,7 +64,7 @@ def learner(model, data, ps, args):
         for name, tensor in model.state_dict(keep_vars=True).items():
             model_state[name] = tensor.detach().clone().cpu()
         ps.push(model_state)
-        if epoch % 10000 == 0:
+        if epoch % 1000 == 0:
             print("save model: %s" % epoch)
             torch.save(model.state_dict(), save_path % epoch)
         batch = []
