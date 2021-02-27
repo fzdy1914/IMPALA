@@ -23,11 +23,11 @@ def make_time_major(batch):
     hx = []
     logits = []
     for t in batch:
-        obs.append(t.obs)
+        obs.append(t.boards)
         rewards.append(t.rewards)
         dones.append(t.dones)
         actions.append(t.actions)
-        logits.append(t.logit)
+        logits.append(t.logits)
         hx.append(t.lstm_hx)
     obs = torch.stack(obs).transpose(0, 1)
     actions = torch.stack(actions).transpose(0, 1)
