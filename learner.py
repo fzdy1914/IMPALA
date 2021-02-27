@@ -1,4 +1,6 @@
 """Learner with parameter server"""
+import os
+
 import torch
 import torch.optim as optim
 import torch.nn.functional as F
@@ -10,17 +12,22 @@ def learner(model, data, ps, args):
     """Learner to get trajectories from Actors."""
     if torch.cuda.is_available():
         model.cuda()
-    optimizer = optim.RMSprop(model.parameters(), lr=args.lr, eps=args.epsilon,
-                              weight_decay=args.decay,
-                              momentum=args.momentum)
+    optimizer = optim.Adam(model.parameters(), lr=args.lr, weight_decay=args.decay)
     batch_size = args.batch_size
     baseline_cost = args.baseline_cost
     entropy_cost = args.entropy_cost
     gamma = args.gamma
     save_path = args.save_path
+    load_path = args.load_path
+    if os.path.exists(load_path):
+        model.load_state_dict(torch.load(load_path))
+        print("Loaded model from:", load_path)
+    else:
+        print("Model %s do not exist" % load_path)
+
     """Gets trajectories from actors and trains learner."""
     batch = []
-    best = 0.
+    epoch = 0
     while True:
         trajectory = data.get()
         batch.append(trajectory)
@@ -28,11 +35,11 @@ def learner(model, data, ps, args):
             trajectory.cuda()
         if len(batch) < batch_size:
             continue
-        behaviour_logits, obs, actions, rewards, dones, hx = make_time_major(batch)
+        boards, actions, rewards, dones, behaviour_logits = make_time_major(batch)
         optimizer.zero_grad()
-        logits, values = model(obs, actions, rewards, dones, hx=hx)
+        logits, values = model(boards)
         bootstrap_value = values[-1]
-        actions, behaviour_logits, dones, rewards = actions[1:], behaviour_logits[1:], dones[1:], rewards[1:]
+        actions, rewards, dones, behaviour_logits = actions[1:], rewards[1:], dones[1:], behaviour_logits[1:]
         logits, values = logits[:-1], values[:-1]
         discounts = (~dones).float() * gamma
         vs, pg_advantages = vtrace.from_logits(
@@ -54,9 +61,10 @@ def learner(model, data, ps, args):
         optimizer.step()
         model.cpu()
         ps.push(model.state_dict())
-        if rewards.mean().item() > best:
-            torch.save(model.state_dict(), save_path)
+        epoch += 1
+        if epoch % 100 == 0:
+            print("save model: %s" % epoch)
+            torch.save(model.state_dict(), save_path % epoch)
         if torch.cuda.is_available():
             model.cuda()
         batch = []
-        print("go with one batch")

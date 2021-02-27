@@ -11,15 +11,13 @@ from utils import ParameterServer
 if __name__ == '__main__':
     mp.set_start_method('spawn')
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--actors", type=int, default=1,
+    parser.add_argument("--actors", type=int, default=8,
                         help="the number of actors to start, default is 8")
     parser.add_argument("--seed", type=int, default=123,
                         help="the seed of random, default is 123")
-    parser.add_argument("--game_name", type=str, default='breakout',
-                        help="the name of atari game, default is breakout")
-    parser.add_argument('--length', type=int, default=5,
+    parser.add_argument('--length', type=int, default=16,
                         help='Number of steps to run the agent')
-    parser.add_argument('--batch_size', type=int, default=10,
+    parser.add_argument('--batch_size', type=int, default=256,
                         help='Number of steps to run the agent')
     parser.add_argument("--gamma", type=float, default=0.99,
                         help="the discount factor, default is 0.99")
@@ -31,13 +29,13 @@ if __name__ == '__main__':
                         help="Learning rate, default is 0.00048")
     parser.add_argument("--decay", type=float, default=0.00001,
                         help="RMSProp optimizer decay, default is .99")
-    parser.add_argument('--save_path', type=str, default="./checkpoint.pt",
+    parser.add_argument('--save_path', type=str, default="./state/epoch-%s.pt",
                         help='Set the path to save trained model parameters')
-    parser.add_argument('--load_path', type=str, default="./checkpoint.pt",
+    parser.add_argument('--load_path', type=str, default="./state/epoch-0.pt",
                         help='Set the path to load trained model parameters')
 
     args = parser.parse_args()
-    data = mp.Queue(maxsize=1)
+    data = mp.Queue(maxsize=256)
     lock = mp.Lock()
     env_args = {'debug': False}
     action_size = 4
