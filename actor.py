@@ -77,8 +77,6 @@ def actor(idx, ps, data, env, args):
     model = DenseNet()
     if torch.cuda.is_available():
         model.cuda()
-    # save_path = args.save_path
-    # load_path = args.load_path
     env.start()
     """Run the env for n steps and return a trajectory rollout."""
 
