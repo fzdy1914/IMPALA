@@ -2,7 +2,7 @@ import torch
 import argparse
 import torch.multiprocessing as mp
 
-from model import Network
+from model import DenseNet
 from learner import learner
 from actor import actor
 from environment import EnvironmentProxy
@@ -11,13 +11,13 @@ from utils import ParameterServer
 if __name__ == '__main__':
     mp.set_start_method('spawn')
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--actors", type=int, default=8,
+    parser.add_argument("--actors", type=int, default=3,
                         help="the number of actors to start, default is 8")
     parser.add_argument("--seed", type=int, default=123,
                         help="the seed of random, default is 123")
     parser.add_argument('--length', type=int, default=16,
                         help='Number of steps to run the agent')
-    parser.add_argument('--batch_size', type=int, default=256,
+    parser.add_argument('--batch_size', type=int, default=128,
                         help='Number of steps to run the agent')
     parser.add_argument("--gamma", type=float, default=0.99,
                         help="the discount factor, default is 0.99")
@@ -35,13 +35,13 @@ if __name__ == '__main__':
                         help='Set the path to load trained model parameters')
 
     args = parser.parse_args()
-    data = mp.Queue(maxsize=256)
+    data = mp.Queue(maxsize=32)
     lock = mp.Lock()
     env_args = {'debug': False}
     action_size = 4
     args.action_size = action_size
     ps = ParameterServer(lock)
-    model = Network(action_size=4)
+    model = DenseNet()
     ps.push(model.state_dict())
     # if torch.cuda.is_available():
     #     model.cuda()

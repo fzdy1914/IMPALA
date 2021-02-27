@@ -8,7 +8,7 @@ import numpy as np
 import torch
 
 from board_stack import encode_state_stack
-from model import Network
+from model import DenseNet
 from parameters import NUM2ACTION
 
 
@@ -74,7 +74,9 @@ def actor(idx, ps, data, env, args):
     played_games = 0
     current_total_length = 0
     length = args.length
-    model = Network(action_size=4)
+    model = DenseNet()
+    if torch.cuda.is_available():
+        model.cuda()
     # save_path = args.save_path
     # load_path = args.load_path
     env.start()
@@ -112,9 +114,12 @@ def actor(idx, ps, data, env, args):
             individual_logits = [list(), list(), list(), list()]
             while not env.done():
                 boards, _, _, _ = encode_state_stack(state)
-                logits, values = model(torch.from_numpy(np.stack(boards)).float())
+                boards = torch.from_numpy(np.stack(boards)).float()
+                if torch.cuda.is_available():
+                    boards = boards.cuda()
+                logits, values = model(boards)
                 for i in range(4):
-                    individual_logits[i].append(logits[i].view(1, 4).detach())
+                    individual_logits[i].append(logits[i].view(1, 4).detach().clone().cpu())
                 actions = torch.softmax(logits, 1).multinomial(1)
                 actions = [NUM2ACTION[i.item()] for i in actions]
                 state = env.step(actions)

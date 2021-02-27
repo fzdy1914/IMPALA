@@ -4,6 +4,8 @@ import os
 import torch
 import torch.optim as optim
 import torch.nn.functional as F
+from tqdm import trange
+
 import vtrace
 from utils import make_time_major
 
@@ -27,8 +29,8 @@ def learner(model, data, ps, args):
 
     """Gets trajectories from actors and trains learner."""
     batch = []
-    epoch = 0
-    while True:
+    t = trange(10000000)
+    for epoch in t:
         trajectory = data.get()
         batch.append(trajectory)
         if torch.cuda.is_available():
@@ -59,12 +61,11 @@ def learner(model, data, ps, args):
         loss += entropy_cost * -(-F.softmax(logits, 1) * F.log_softmax(logits, 1)).sum(-1).sum()
         loss.backward()
         optimizer.step()
-        model.cpu()
-        ps.push(model.state_dict())
-        epoch += 1
-        if epoch % 100 == 0:
+        model_state = dict()
+        for name, tensor in model.state_dict(keep_vars=True).items():
+            model_state[name] = tensor.detach().clone().cpu()
+        ps.push(model_state)
+        if epoch % 10000 == 0:
             print("save model: %s" % epoch)
             torch.save(model.state_dict(), save_path % epoch)
-        if torch.cuda.is_available():
-            model.cuda()
         batch = []
