@@ -9,9 +9,9 @@ from environment import EnvironmentProxy
 from utils import ParameterServer
 
 if __name__ == '__main__':
-    mp.set_start_method('spawn')
+    # mp.set_start_method('spawn')
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--actors", type=int, default=3,
+    parser.add_argument("--actors", type=int, default=6,
                         help="the number of actors to start, default is 8")
     parser.add_argument("--seed", type=int, default=123,
                         help="the seed of random, default is 123")
@@ -40,16 +40,17 @@ if __name__ == '__main__':
     env_args = {'debug': False}
     action_size = 4
     args.action_size = action_size
-    ps = ParameterServer(lock)
+
+    is_training_done = mp.Event()
+    is_training_done.clear()
+    qs = [mp.Queue(maxsize=10) for _ in range(args.actors)]
+
     model = DenseNet()
-    ps.push(model.state_dict())
-    # if torch.cuda.is_available():
-    #     model.cuda()
     envs = [EnvironmentProxy(env_args) for idx in range(args.actors)]
 
-    learner = mp.Process(target=learner, args=(model, data, ps, args))
+    learner = mp.Process(target=learner, args=(model, data, qs, is_training_done, args))
 
-    actors = [mp.Process(target=actor, args=(idx, ps, data, envs[idx], args))
+    actors = [mp.Process(target=actor, args=(idx, qs[idx], data, envs[idx], is_training_done, args))
               for idx in range(args.actors)]
     learner.start()
     [actor.start() for actor in actors]

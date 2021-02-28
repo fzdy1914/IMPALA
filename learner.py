@@ -1,5 +1,6 @@
 """Learner with parameter server"""
 import os
+import time
 
 import torch
 import torch.optim as optim
@@ -10,7 +11,7 @@ import vtrace
 from utils import make_time_major
 
 
-def learner(model, data, ps, args):
+def learner(model, data, qs, is_training_done, args):
     """Learner to get trajectories from Actors."""
     if torch.cuda.is_available():
         model.cuda()
@@ -63,7 +64,9 @@ def learner(model, data, ps, args):
         model_state = dict()
         for name, tensor in model.state_dict(keep_vars=True).items():
             model_state[name] = tensor.detach().clone().cpu()
-        ps.push(model_state)
+        if epoch % 100 == 0:
+            for q in qs:
+                q.put(model_state)
         if epoch % 1000 == 0:
             print("save model: %s" % epoch)
             torch.save(model.state_dict(), save_path % epoch)

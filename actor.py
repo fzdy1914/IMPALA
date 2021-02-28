@@ -69,7 +69,7 @@ class Trajectory(object):
                    (self.actor_id, self.player_id, self.boards.shape, self.logits.shape, self.actions.shape, self.rewards.shape, self.dones.shape)
 
 
-def actor(idx, ps, data, env, args):
+def actor(idx, q, data, env, is_training_done, args):
     """Simple actor """
     played_games = 0
     current_total_length = 0
@@ -88,9 +88,13 @@ def actor(idx, ps, data, env, args):
 
         trajectory_list = [Trajectory(), Trajectory(), Trajectory(), Trajectory()]
 
-        while True:
-            model.load_state_dict(ps.pull())
-
+        while not is_training_done.is_set():
+            if not q.empty():
+                model_state = q.get()
+                while not q.empty():
+                    model_state = q.get()
+                model.load_state_dict(model_state)
+                print("Actor: {}, Loaded Model".format(idx))
             state = env.reset(4)
             boards, _, _, _ = encode_state_stack(state)
             boards = torch.from_numpy(np.stack(boards)).float()
