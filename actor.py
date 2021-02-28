@@ -94,7 +94,6 @@ def actor(idx, q, data, env, is_training_done, args):
                 while not q.empty():
                     model_state = q.get()
                 model.load_state_dict(model_state)
-                print("Actor: {}, Loaded Model".format(idx))
             state = env.reset(4)
             boards, _, _, _ = encode_state_stack(state)
             boards = torch.from_numpy(np.stack(boards)).float()
