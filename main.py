@@ -4,9 +4,8 @@ import torch.multiprocessing as mp
 
 from model import DenseNet
 from learner import learner
-from actor import actor
+from actor_with_other_agent import actor
 from environment import EnvironmentProxy
-from utils import ParameterServer
 
 if __name__ == '__main__':
     # mp.set_start_method('spawn')
