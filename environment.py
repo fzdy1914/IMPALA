@@ -1,7 +1,7 @@
 import torch.multiprocessing as mp
 from kaggle_environments import make
 
-from board_stack import encode_env_stack
+from board_stack_plus import encode_env_stack_plus
 
 
 class HungryGeese:
@@ -9,7 +9,7 @@ class HungryGeese:
         self.env = make("hungry_geese", debug=debug)
 
     def get_rollout_list(self):
-        return encode_env_stack(self.env)
+        return encode_env_stack_plus(self.env)
 
     def step(self, actions):
         self.env.step(actions)

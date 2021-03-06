@@ -68,6 +68,6 @@ def learner(model, data, qs, is_training_done, args):
             for q in qs:
                 q.put(model_state)
         if (epoch + 1) % 1000 == 0:
-            print("save model: %s" % epoch)
-            torch.save(model.state_dict(), save_path % epoch)
+            print("save model: %s" % (epoch + 1))
+            torch.save(model.state_dict(), save_path % (epoch + 1))
         batch = []
