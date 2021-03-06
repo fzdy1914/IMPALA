@@ -1,7 +1,5 @@
-from enum import Enum
-
 import numpy as np
-from kaggle_environments.envs.hungry_geese.hungry_geese import row_col, translate
+from kaggle_environments.envs.hungry_geese.hungry_geese import translate
 
 from parameters import *
 
@@ -88,43 +86,29 @@ def encode_env_stack_plus(env, interest_agent=(1, 1, 1, 1)):
                 reward = final_rewards[i]
 
             rollout_list[i].append((next_board_list[i], action_list[i], reward, next_done_list[i]))
-            # print(current_board_list[i], action_list[i], reward, "\n", next_board_list[i], next_done_list[i], "\n")
         current_length_list = next_length_list
         current_done_list = next_done_list
     return rollout_list
 
 
-# def encode_observation_stack_plus(observation, action="NORTH", roll=False):
-#     board = np.zeros((4, ROW, COLUMN))
-#     food_board = np.zeros((1, ROW, COLUMN))
-#     for pos in observation["food"]:
-#         food_board[0][row_col(pos, COLUMN)] = Grid.FOOD
-#
-#     for idx, geese in enumerate(observation["geese"]):
-#         for pos in geese:
-#             board[idx][row_col(pos, COLUMN)] = Grid.GOOSE_BODY
-#         if len(geese) > 0:
-#             board[idx][row_col(geese[-1], COLUMN)] = Grid.OTHER_TAIL
-#             board[idx][row_col(geese[0], COLUMN)] = Grid.OTHER_HEAD
-#
-#     i = observation["index"]
-#
-#     self_goose = observation["geese"][i]
-#
-#     if len(self_goose) > 0:
-#         board[i][row_col(self_goose[-1], COLUMN)] = Grid.GOOSE_TAIL
-#         board[i][
-#             row_col(translate(self_goose[0], Action[action].opposite(), COLUMN, ROW), COLUMN)
-#         ] = Grid.GOOSE_BODY  # virtual body to avoid taking opposite action
-#
-#         head_pos = row_col(self_goose[0], COLUMN)
-#         board[i][head_pos] = Grid.GOOSE_HEAD
-#
-#         offset_x = ROW_CENTER - head_pos[0] if roll else 0
-#         offset_y = COLUMN_CENTER - head_pos[1] if roll else 0
-#         board = np.roll(board, (-i, offset_x, offset_y), axis=(0, 1, 2))
-#         board = np.concatenate([board, np.roll(food_board, (-i, offset_x, offset_y), axis=(0, 1, 2))], axis=0)
-#     else:
-#         return np.zeros((5, ROW, COLUMN))
-#
-#     return board
+def encode_observation_stack_plus(observation_list):
+    observation = observation_list[-1]
+    board = np.zeros((16, 7 * 11))
+    food_board = np.zeros((1, 7 * 11))
+
+    for pos in observation["food"]:
+        food_board[0, pos] = 1
+
+    for idx, goose in enumerate(observation["geese"]):
+        if len(goose) > 0:
+            board[idx * 4 + 0][goose[0]] = 1
+            board[idx * 4 + 1][goose[-1]] = 1
+            if len(observation_list) > 1:
+                board[idx * 4 + 2][observation_list[-2]["geese"][idx][0]] = 1
+        for pos in goose:
+            board[idx * 4 + 3][pos] = 1
+
+    i = observation["index"]
+    board = np.concatenate([np.roll(board, (-i * 4, 0), axis=(0, 1)), food_board], axis=0).reshape(-1, 7, 11)
+
+    return board

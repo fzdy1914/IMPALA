@@ -45,17 +45,17 @@ STATUS = {
 }
 
 ACTION2NUM = {
-    "NORTH": 0,
-    "EAST": 1,
-    "SOUTH": 2,
-    "WEST": 3,
+    "EAST": 0,
+    "SOUTH": 1,
+    "WEST": 2,
+    "NORTH": 3,
 }
 
 NUM2ACTION = {
-    0: "NORTH",
-    1: "EAST",
-    2: "SOUTH",
-    3: "WEST",
+    0: "EAST",
+    1: "SOUTH",
+    2: "WEST",
+    3: "NORTH",
 }
 
 ENV_DICT = {
