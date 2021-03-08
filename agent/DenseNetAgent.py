@@ -11,7 +11,7 @@ from silent_agent_helper import get_available_action
 prev_action = "NORTH"
 
 model = DenseNet()
-model.load_state_dict(torch.load('./our_model.pt', map_location=torch.device('cpu')))
+model.load_state_dict(torch.load('/kaggle_simulations/agent/model.pt', map_location=torch.device('cpu')))
 model.eval()
 
 
