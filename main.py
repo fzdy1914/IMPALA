@@ -4,7 +4,7 @@ import torch.multiprocessing as mp
 
 from model import DenseNet
 from learner import learner
-from actor import actor
+from actor_with_other_agent import actor
 from environment import EnvironmentProxy
 
 if __name__ == '__main__':

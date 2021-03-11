@@ -4,6 +4,8 @@
 # This source code is licensed under the BSD-style license found in the
 # LICENSE file in the root directory of this source tree.
 """Actor to generate trajactories"""
+import os
+
 import numpy as np
 import torch
 
@@ -78,6 +80,12 @@ def actor(idx, q, data, env, is_training_done, args):
     current_total_length = 0
     length = args.length
     model = DenseNet()
+    load_path = args.load_path
+    if os.path.exists(load_path):
+        model.load_state_dict(torch.load(load_path))
+        print("Loaded model from:", load_path)
+    else:
+        print("Model %s do not exist" % load_path)
     if torch.cuda.is_available():
         model.cuda()
     env.start()
