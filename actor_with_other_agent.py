@@ -9,7 +9,7 @@ import os
 import numpy as np
 import torch
 
-from board_stack import encode_state_stack
+from board_stack_plus import encode_state_stack_plus
 from model import DenseNet
 from parameters import NUM2ACTION
 from agent.risk_averse_greedy import RiskAverseGreedyAgent
@@ -111,7 +111,7 @@ def actor(idx, q, data, env, is_training_done, args):
                 model.load_state_dict(model_state)
             state = env.reset(4)
 
-            boards, _, _, _ = encode_state_stack(state)
+            boards, _, _, _ = encode_state_stack_plus(state)
             boards = torch.from_numpy(np.stack(boards)).float()
 
             for i in range(2):
@@ -130,7 +130,7 @@ def actor(idx, q, data, env, is_training_done, args):
 
             individual_logits = [list(), list()]
             while not env.done():
-                boards, _, _, _ = encode_state_stack(state)
+                boards, _, _, _ = encode_state_stack_plus(state)
                 boards = torch.from_numpy(np.stack(boards[:2])).float()
                 if torch.cuda.is_available():
                     boards = boards.cuda()
