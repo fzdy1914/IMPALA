@@ -10,7 +10,7 @@ from environment import EnvironmentProxy
 if __name__ == '__main__':
     # mp.set_start_method('spawn')
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--actors", type=int, default=6,
+    parser.add_argument("--actors", type=int, default=12,
                         help="the number of actors to start, default is 8")
     parser.add_argument("--seed", type=int, default=123,
                         help="the seed of random, default is 123")
