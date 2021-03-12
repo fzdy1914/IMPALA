@@ -9,6 +9,7 @@ from environment import EnvironmentProxy
 
 if __name__ == '__main__':
     # mp.set_start_method('spawn')
+    mp.set_sharing_strategy('file_system')
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--actors", type=int, default=12,
                         help="the number of actors to start, default is 8")

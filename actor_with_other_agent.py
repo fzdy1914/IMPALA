@@ -75,7 +75,7 @@ class Trajectory(object):
 
 
 def actor(idx, q, data, env, is_training_done, args):
-    if idx < 6:
+    if idx < 4:
         device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     else:
         device = torch.device("cuda:1" if torch.cuda.is_available() else "cpu")
