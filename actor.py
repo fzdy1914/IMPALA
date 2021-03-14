@@ -73,6 +73,10 @@ class Trajectory(object):
 
 def actor(idx, q, data, env, is_training_done, args):
     """Simple actor """
+    if idx < 4:
+        device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+    else:
+        device = torch.device("cuda:1" if torch.cuda.is_available() else "cpu")
     played_games = 0
     current_total_length = 0
     length = args.length
@@ -83,8 +87,7 @@ def actor(idx, q, data, env, is_training_done, args):
         print("Loaded model from:", load_path)
     else:
         print("Model %s do not exist" % load_path)
-    if torch.cuda.is_available():
-        model.cuda()
+    model.to(device)
     env.start()
     """Run the env for n steps and return a trajectory rollout."""
 
@@ -124,8 +127,7 @@ def actor(idx, q, data, env, is_training_done, args):
             while not env.done():
                 boards, _, _, _ = encode_state_stack_plus(state)
                 boards = torch.from_numpy(np.stack(boards)).float()
-                if torch.cuda.is_available():
-                    boards = boards.cuda()
+                boards = boards.to(device)
                 logits, values = model(boards)
                 for i in range(4):
                     individual_logits[i].append(logits[i].view(1, 4).detach().clone().cpu())
