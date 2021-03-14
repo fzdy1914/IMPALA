@@ -20,7 +20,7 @@ class ConvBlock(nn.Module):
 class DenseNet(nn.Module):
     def __init__(self):
         super().__init__()
-        layers, filters = 12, 32
+        layers, filters = 12, 64
         self.conv0 = ConvBlock(17, filters)
         self.blocks = nn.ModuleList([ConvBlock(filters, filters) for _ in range(layers)])
         self.head_p = nn.Linear(filters, 4, bias=False)
