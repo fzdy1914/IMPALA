@@ -1,7 +1,7 @@
 import torch.multiprocessing as mp
 from kaggle_environments import make
 
-from board_stack_plus import encode_env_stack_plus
+from board_stack_plus_split import encode_env_stack_plus
 
 
 class HungryGeese:

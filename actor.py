@@ -9,7 +9,7 @@ import os
 import numpy as np
 import torch
 
-from board_stack_plus import encode_state_stack_plus
+from board_stack_plus_split import encode_state_stack_plus
 from model import DenseNet
 from parameters import NUM2ACTION
 
@@ -73,7 +73,7 @@ class Trajectory(object):
 
 def actor(idx, q, data, env, is_training_done, args):
     """Simple actor """
-    if idx < 4:
+    if idx < 2:
         device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     else:
         device = torch.device("cuda:1" if torch.cuda.is_available() else "cpu")
