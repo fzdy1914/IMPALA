@@ -30,7 +30,7 @@ def learner(model, data, qs, is_training_done, args):
 
     """Gets trajectories from actors and trains learner."""
     batch = []
-    t = trange(100000)
+    t = trange(1000000)
     for epoch in t:
         while len(batch) < batch_size:
             trajectory = data.get()
@@ -67,7 +67,7 @@ def learner(model, data, qs, is_training_done, args):
         if epoch % 100 == 0:
             for q in qs:
                 q.put(model_state)
-        if (epoch + 1) % 1000 == 0:
+        if (epoch + 1) % 10000 == 0:
             print("save model: %s" % (epoch + 1))
             torch.save(model.state_dict(), save_path % (epoch + 1))
         batch = []
