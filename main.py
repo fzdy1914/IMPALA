@@ -11,11 +11,11 @@ if __name__ == '__main__':
     # mp.set_start_method('spawn')
     mp.set_sharing_strategy('file_system')
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--actors", type=int, default=12,
+    parser.add_argument("--actors", type=int, default=10,
                         help="the number of actors to start, default is 8")
     parser.add_argument("--seed", type=int, default=123,
                         help="the seed of random, default is 123")
-    parser.add_argument('--length', type=int, default=16,
+    parser.add_argument('--length', type=int, default=32,
                         help='Number of steps to run the agent')
     parser.add_argument('--batch_size', type=int, default=128,
                         help='Number of steps to run the agent')
